@@ -1,7 +1,7 @@
-import csv
+#import csv
 import pandas as pd 
 
-import os
+#import os
 #print(os.getcwd())
 # Out: /Users/shane/Documents/blog
 # Display all of the files found in your current working directory
@@ -34,5 +34,3 @@ if __name__ == "__main__":
     data = acq_data()
     # Preview the first 5 lines of the loaded data 
     print(data.head())
-    print(data.values.flatten('B'))
-
