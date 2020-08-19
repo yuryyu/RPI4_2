@@ -1,17 +1,17 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from data_acq import *
-from init import isplot, issave
+from init import *
 
 
 def thrh_comp(Y):
     ''' Used for Dynamic Threshold calculation and therein carries scattered energy info'''
-    percen_thr=0.05 # 5% of max energy holds
+    #percen_thr=0.05 # 5% of max energy holds - defined in init.py
     return np.mean(np.sort(abs(Y))[-int(len(Y)*percen_thr):-1])
  
 
 def fft_block(Xdata, isplot, issave, fname='data/AxisX_pass.png'):
-    Fs = 2048.0  # sampling rate
+    #Fs = 2048.0  # sampling rate - defined in init.py
     Ts = 1.0/Fs # sampling interval
     t = np.arange(0,len(Xdata)/Fs,Ts) # time vector
     y = Xdata - np.mean(Xdata)
@@ -40,10 +40,10 @@ def fft_block(Xdata, isplot, issave, fname='data/AxisX_pass.png'):
         if issave:
             plt.savefig(fname)        
         plt.show()
-    return thrh*10000    
+    return thrh*10000 # 1000 - imperical normalization factor   
 
-def fft_main(fname = "data/data_good.csv"):
-    data = acq_data(fname)
+def fft_main():
+    data = acq_data()
     datapool=[  data.AxisX.to_numpy(),
                 data.AxisY.to_numpy(),
                 data.AxisZ.to_numpy()]
@@ -53,6 +53,7 @@ def fft_main(fname = "data/data_good.csv"):
     return Ax_thrh
 
 
-if __name__ == "__main__":    
-    print( fft_main("data/data_good.csv"))   
+if __name__ == "__main__":
+    # you can check functionality by running it a stand alone module    
+    print( fft_main())   
     

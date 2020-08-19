@@ -8,7 +8,7 @@ from scipy.spatial import distance
 import statistics
 
 def vib_dsp():
-   current = fft_main("data/data_good.csv")
+   current = fft_main()
    d = distance.euclidean(current, Axes_Threshold)
    print("Euclidean distance: ",d)
    std = statistics.stdev([abs(j-i) for i,j in zip(current , Axes_Threshold)])
@@ -20,7 +20,7 @@ def vib_dsp():
    
 
 def send2manager(client, msg2snt):
-   # mqtt client
+   # client - mqtt client
    tnow = time.localtime(time.time())
    msg = 'Dsp_vib Msg: ' + msg2snt + ' at ' + time.asctime(tnow)
    client.publish(sub_topic[0], msg)
