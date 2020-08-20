@@ -4,7 +4,6 @@ from init import *
 import sqlite3
 from sqlite3 import Error
 
-
 # Accelerometer, magnetometer, gyroscope.    
 def DOF():
     import time
@@ -53,34 +52,11 @@ def DOF():
         # Delay for a second.
         time.sleep(1.0/Fs)
 
-def G200():
-    pass
-
-
-#import os
-#print(os.getcwd())
-# Out: /Users/shane/Documents/blog
-# Display all of the files found in your current working directory
-#print(os.listdir(os.getcwd())
-# read csv
-# with open('C:\\Users\\yuzba\\Documents\\GitHub\\RPI4_2\\data\\K544_TLV_20-05-2020_NODE_4191.csv') as csv_file:
-#     csv_reader = csv.reader(csv_file, delimiter=',')
-#     line_count = 0
-#     for row in csv_reader:
-#         print(row)
-#         line_count += 1
-#     print(f'Processed {line_count} lines.')
-
-
-# save csv
-# with open('employee_file.csv', mode='w') as employee_file:
-#     employee_writer = csv.writer(employee_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-
-#     employee_writer.writerow(['John Smith', 'Accounting', 'November'])
-#     employee_writer.writerow(['Erica Meyers', 'IT', 'March'])    
-
-
-
+# Accelerometer
+def gLink200():
+    # run external terminal command for data acquisition from GLink-200 or use glink package for the same
+    import glink as gl
+    return gl.data_acq(Fs, acqtime)
 
 def create_connection(db_file):
     """ create a database connection to a SQLite database """
@@ -88,28 +64,34 @@ def create_connection(db_file):
     try:
         conn = sqlite3.connect(db_file)
         print(sqlite3.version)
+        return conn
     except Error as e:
         print(e)
-    finally:
-        if conn:
-            conn.close()
-
-
-
+ 
 def acq_data():
     if onboard:
-        data = DOF()
-    elif db_init:
-        data = pd.read_csv("data/data_good.csv")
-        data.to_sql(table_name, conn, if_exists='append', index=False)
+        if is_glink:
+            data = DOF()
+        else:
+            data = gLink200()
     else:
-        data = pd.read_csv("data/data_good.csv")
+        conn= create_connection(db_name)
+        table_name = 'K544_Data'
+        try:
+            if db_init:                
+                data = pd.read_csv("data/data_good.csv")
+                data.to_sql(table_name, conn, if_exists='append', index=False)                       
+            else:
+                data = pd.read_sql_query("SELECT * FROM "+table_name, conn)
+        except Error as e:
+            print(e)
+        finally:    
+            if conn:
+                conn.close()    
     return data 
 
 
-
-if __name__ == "__main__":
-    create_connection(db_name)
+if __name__ == "__main__":    
     data = acq_data()
     # Preview the first 5 lines of the loaded data 
     print(data.head())

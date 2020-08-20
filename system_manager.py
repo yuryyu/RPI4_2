@@ -6,6 +6,7 @@ import logging
 import queue
 import random
 from init import *
+from dsp_vib import *
 
 def on_log(client, userdata, level, buf):
     print("log: "+buf)
@@ -21,11 +22,18 @@ def on_message(client,userdata,msg):
     m_decode=str(msg.payload.decode("utf-8","ignore"))
     process_message(client,m_decode,topic)
     print(m_decode)
+
+
 def process_message(client,msg,topic):
-    print("message processed: ",topic,msg)
-    for ms in msg_device:
-        if ms in msg:
-            send_msg(client, pub_topic, msg)
+    print("message processed: ",topic,msg)    
+    if 'start' in msg:
+        # run DSP module
+        print('Vibration analysis started')
+        if vib_dsp():
+            print('Detected vibration issue, sending warning message')
+            send2manager(client,msg_system[0])
+
+
 def send_msg(client, topic, message):
     print("Sending message: " + message)
     tnow=time.localtime(time.time())
@@ -52,8 +60,8 @@ def main():
 
     # main monitoring loop
     client.loop_start()  #Start loop
-    for tp in sub_topic:
-        client.subscribe(tp)
+    
+    client.subscribe(ext_man)
     try:
         while conn_time==0:
             pass
