@@ -32,6 +32,9 @@ def process_message(client,msg,topic):
         if vib_dsp():
             print('Detected vibration issue, sending warning message')
             send2manager(client,msg_system[0])
+        else:
+            print('Don not detected any issue, sending info message')
+            send2manager(client,msg_system[-1])    
 
 
 def send_msg(client, topic, message):
